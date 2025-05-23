@@ -1,0 +1,24 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+System_Boundary(mvp, "Модуль ставок депозитов") {
+  Container(webui, "Админка ставок", "Web/React", "Внесение и публикация ставок")
+  Container(api, "API ставок", "C# .NET/Java", "Отдаёт ставки по запросу внутренним системам")
+  ContainerDb(db, "Хранилище ставок", "MS SQL/Oracle", "Ставки депозитов")
+  Container(export, "Экспорт в файл", "C#/Java", "Генерирует файл ставок для внешних систем")
+}
+
+System_Boundary(cccrm, "Система кол-центра") {
+  Container(cccrm_ui, "Интерфейс оператора", "Web", "Работа со ставками и обращениями клиентов")
+}
+
+System_Ext(partnercrm, "Партнёрская система кол-центра")
+System_Ext(sftp, "SFTP сервер для файлов")
+
+Rel(cccrm_ui, api, "Запрашивает ставки для операторов")
+Rel(api, db, "Читает данные о ставках")
+Rel(webui, db, "Редактирует и публикует ставки")
+Rel(export, db, "Забирает ставки для файла")
+Rel(export, sftp, "Генерирует файл и кладёт на сервер")
+Rel(partnercrm, sftp, "Забирает актуальный файл для операторов")
+@enduml

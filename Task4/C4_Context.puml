@@ -1,0 +1,17 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Context.puml
+
+Person(op, "Оператор кол-центра", "Получает ставки через свою CRM")
+Person(partnerop, "Оператор партнёрского кол-центра", "Видит ставки из файла")
+System(mvp, "Модуль ставок депозитов", "Обновляет и хранит ставки, отдаёт их по API и в файл")
+System(cccrm, "Система кол-центра", "Внутренний CRM банк")
+System(partnercrm, "Партнёрская система кол-центра", "Внешняя по отношению к банку")
+System_Ext(sftp, "SFTP сервер/файл-хранилище", "Передача файлов наружу")
+
+Rel(op, cccrm, "Работает с заявками, видит ставки")
+Rel(cccrm, mvp, "Получает ставки через API или прямой запрос")
+Rel(partnerop, partnercrm, "Работает с обращениями, ставки из файла")
+Rel(partnercrm, sftp, "Забирает актуальный файл ставок")
+Rel(sftp, mvp, "Получает актуальный файл ставок по расписанию")
+Rel(mvp, cccrm, "Отдаёт ставки через сервисы/API")
+@enduml

@@ -1,0 +1,39 @@
+@startuml
+!includeurl https://raw.githubusercontent.com/plantuml-stdlib/C4-PlantUML/master/C4_Container.puml
+
+System_Boundary(ib_boundary, "Интернет-банк") {
+    Container(web, "Веб-клиент", "ASP.NET MVC", "UI интернет-банка для клиентов")
+    Container(api, "API Депозитов", "C# .NET Core", "Backend-логика обработки заявок и интеграций")
+}
+
+System_Boundary(mvp_boundary, "Модуль депозитов (MVP)") {
+    Container(mvp_ui, "Админка бэк-офиса", "Web/React или ASP.NET", "Обработка заявок и согласования")
+    Container(offers, "Модуль ставок/хранилище", "Oracle или MS SQL", "Работа с депозитными ставками")
+}
+
+System_Boundary(abc_boundary, "АБС") {
+    Container(abc_app, "Десктоп-клиент АБС", "Delphi", "Работа сотрудников банка")
+    Container(abc_api, "API интеграции", "Delphi/PLSQL", "Интерфейс для внешних сервисов")
+    ContainerDb(abc_db, "Oracle DB", "СУБД", "Депозиты, счета, клиенты и др.")
+}
+
+System_Ext(website, "Сайт банка", "Подача заявок на депозиты")
+System_Ext(sms, "СМС-шлюз", "Внешний шлюз СМС")
+System_Ext(crm, "CRM/Кол-центр", "Обращения и обзвон клиентов")
+
+'==== Взаимодействия ====
+Rel(website, api, "Передача заявок новых клиентов")
+Rel(web, api, "Подача заявок (действующие клиенты)")
+Rel(api, offers, "Запрос и валидация ставок")
+Rel(api, mvp_ui, "Просмотр/обработка заявок бэк-офисом", "Web-интерфейс/REST")
+Rel(api, abc_api, "Открытие депозитов", "REST/SOAP API")
+Rel(api, sms, "СМС-уведомления", "REST API")
+Rel(api, crm, "Передача онлайн-заявок новых клиентов", "REST API")
+
+Rel(mvp_ui, offers, "Управление ставками")
+Rel(offers, abc_db, "Хранение ставок", "SQL")
+
+Rel(abc_api, abc_db, "Операции депозитов", "SQL")
+Rel(abc_app, abc_db, "Ручная работа сотрудников", "SQL")
+
+@enduml
